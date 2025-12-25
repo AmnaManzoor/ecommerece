@@ -15,8 +15,8 @@ import './NavBar.css';
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
-  const { getTotalItems } = useCart();
-  const cartItemCount = getTotalItems();
+  const { getCartItemCount } = useCart();
+  const cartItemCount = getCartItemCount();
 
   return (
     <AppBar position="sticky" className="navbar-appbar">

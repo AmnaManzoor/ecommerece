@@ -30,11 +30,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     e.stopPropagation();
     // Get first available color and size
     const firstColor = product.colors?.[0];
-    const firstSize = firstColor?.variants[0]?.size;
+    const firstSize = firstColor?.variants?.[0]?.size;
     if (firstColor && firstSize) {
-      addToCart(product, firstColor.name, firstSize);
+      addToCart({
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        image: firstColor.images[0] || product.image,
+        color: firstColor.name,
+        size: firstSize,
+      });
     } else {
-      addToCart(product);
+      // Fallback for products without variants
+      addToCart({
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        color: 'Default',
+        size: 'One Size',
+      });
     }
   };
 

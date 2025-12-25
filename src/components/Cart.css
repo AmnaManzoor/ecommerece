@@ -1,0 +1,10 @@
+.cart-page {
+  min-height: calc(100vh - 200px);
+  padding: 2rem 0;
+}
+
+@media (max-width: 768px) {
+  .cart-page {
+    padding: 1rem 0;
+  }
+}
