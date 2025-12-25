@@ -1,0 +1,50 @@
+.navbar-appbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.navbar-toolbar {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px !important;
+}
+
+.navbar-logo {
+  margin-right: 20px;
+  transition: opacity 0.3s ease;
+}
+
+.navbar-logo:hover {
+  opacity: 0.9;
+}
+
+.navbar-link {
+  text-transform: none !important;
+  font-weight: 500 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+.navbar-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.cart-button {
+  transition: transform 0.3s ease !important;
+}
+
+.cart-button:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .navbar-toolbar {
+    padding: 0 15px !important;
+  }
+
+  .navbar-link {
+    font-size: 0.875rem !important;
+    padding: 6px 8px !important;
+  }
+}

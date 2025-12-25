@@ -1,15 +1,41 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#667eea',
+    },
+    secondary: {
+      main: '#764ba2',
+    },
+  },
+  typography: {
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+    ].join(','),
+  },
+});
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <App />
+    </ThemeProvider>
   </React.StrictMode>
 );
 

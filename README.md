@@ -1,4 +1,22 @@
-# Getting Started with Create React App
+# ecommerce - Men's Online Shop
+
+A modern React TypeScript e-commerce application for men's fashion.
+
+## ⚠️ Important: Running the Application
+
+**You must run `npm start` from inside the `ecommerece` directory, not from the parent "Loopply Web" directory.**
+
+```bash
+cd ecommerece
+npm start
+```
+
+## Features
+
+- **Home Page**: Displays a grid of product cards with images, names, prices, and descriptions
+- **NavBar**: Sticky navigation bar with links to different pages
+- **Footer**: Comprehensive footer with links and contact information
+- **Product Cards**: Beautiful, responsive product cards with hover effects
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
