@@ -3,7 +3,10 @@ import {
   Card,
   CardContent,
   CardMedia,
+  CardActions,
   Typography,
+  Button,
+  Rating,
   Box,
 } from '@mui/material';
 import { Product } from '../types/Product';
@@ -44,6 +47,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         >
           ${product.price.toFixed(2)}
         </Typography>
+        <Box className="product-rating" sx={{ mb: 2 }}>
+          <Rating
+            value={product.rating}
+            readOnly
+            precision={0.5}
+            size="medium"
+            sx={{
+              '& .MuiRating-iconFilled': {
+                color: '#ffc107',
+              },
+              '& .MuiRating-iconEmpty': {
+                color: '#e0e0e0',
+              },
+            }}
+          />
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            component="span"
+            sx={{ ml: 1, color: '#666' }}
+          >
+            ({product.rating.toFixed(1)})
+          </Typography>
+        </Box>
         <Typography
           variant="body2"
           color="text.secondary"
@@ -52,6 +79,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {product.description}
         </Typography>
       </CardContent>
+      <CardActions className="product-actions">
+        <Button 
+          variant="contained" 
+          fullWidth 
+          className="product-button"
+          sx={{
+            backgroundColor: '#667eea',
+            '&:hover': {
+              backgroundColor: '#5568d3',
+            },
+          }}
+        >
+          Add to Cart
+        </Button>
+      </CardActions>
     </Card>
   );
 };

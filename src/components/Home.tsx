@@ -3,7 +3,6 @@ import {
   Box,
   Container,
   Typography,
-  Grid,
 } from '@mui/material';
 import ProductCard from './ProductCard';
 import { products } from '../data/products';
@@ -23,13 +22,34 @@ const Home: React.FC = () => {
         </Container>
       </Box>
       <Container maxWidth="lg" className="products-container">
-        <Grid container spacing={4}>
+        <Typography 
+          variant="h4" 
+          component="h2" 
+          className="products-title"
+          gutterBottom
+          sx={{ mb: 4, textAlign: 'center', fontWeight: 600, color: '#2c3e50' }}
+        >
+          Our Products
+        </Typography>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(3, 1fr)',
+              lg: 'repeat(4, 1fr)',
+            },
+            gap: 4,
+            width: '100%',
+          }}
+        >
           {products.map((product) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+            <Box key={product.id}>
               <ProductCard product={product} />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
     </Box>
   );

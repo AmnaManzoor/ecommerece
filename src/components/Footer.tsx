@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   Container,
-  Grid,
   Typography,
   Link,
   IconButton,
@@ -17,16 +16,27 @@ const Footer: React.FC = () => {
   return (
     <Box component="footer" className="footer">
       <Container maxWidth="lg" className="footer-container">
-        <Grid container spacing={4}>
-          <Grid item xs={12} sm={6} md={3}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(4, 1fr)',
+            },
+            gap: 4,
+            width: '100%',
+          }}
+        >
+          <Box>
             <Typography variant="h6" className="footer-title" gutterBottom>
               ecommerce
             </Typography>
             <Typography variant="body2" className="footer-description">
               Your premier destination for men's fashion. Quality clothing for the modern gentleman.
             </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          </Box>
+          <Box>
             <Typography variant="h6" className="footer-heading" gutterBottom>
               Quick Links
             </Typography>
@@ -36,8 +46,8 @@ const Footer: React.FC = () => {
               <li><Link href="/about" color="inherit" underline="hover">About Us</Link></li>
               <li><Link href="/contact" color="inherit" underline="hover">Contact</Link></li>
             </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          </Box>
+          <Box>
             <Typography variant="h6" className="footer-heading" gutterBottom>
               Customer Service
             </Typography>
@@ -47,8 +57,8 @@ const Footer: React.FC = () => {
               <li><Link href="/faq" color="inherit" underline="hover">FAQ</Link></li>
               <li><Link href="/support" color="inherit" underline="hover">Support</Link></li>
             </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          </Box>
+          <Box>
             <Typography variant="h6" className="footer-heading" gutterBottom>
               Connect With Us
             </Typography>
@@ -82,8 +92,8 @@ const Footer: React.FC = () => {
               Email: support@ecommerce.com<br />
               Phone: (555) 123-4567
             </Typography>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Container>
       <Divider sx={{ my: 2 }} />
       <Box className="footer-bottom">
