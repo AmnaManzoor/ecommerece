@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect, useMemo, useCallback, type SyntheticEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -15,9 +15,32 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { PRIMARY_COLOR, PRIMARY_HOVER, ALERT_TIMEOUT } from '../constants/theme';
 import './ProductDetail.css';
 
-const ProductDetail: React.FC = () => {
+const buttonSx = {
+  backgroundColor: PRIMARY_COLOR,
+  '&:hover': { backgroundColor: PRIMARY_HOVER },
+};
+
+const outlinedButtonSx = {
+  borderColor: PRIMARY_COLOR,
+  color: PRIMARY_COLOR,
+  '&:hover': {
+    borderColor: PRIMARY_HOVER,
+    backgroundColor: 'rgba(102, 126, 234, 0.04)',
+  },
+};
+
+const handleImageError = (e: SyntheticEvent<HTMLImageElement>) => {
+  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x800?text=Product+Image';
+};
+
+const handleThumbnailError = (e: SyntheticEvent<HTMLImageElement>) => {
+  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/100x100?text=Image';
+};
+
+const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -29,48 +52,62 @@ const ProductDetail: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
 
-  if (!product) {
-    return (
-      <Container>
-        <Typography variant="h4">Product not found</Typography>
-      </Container>
-    );
-  }
+  // Compute derived values using useMemo before any early returns
+  const colors = useMemo(() => product?.colors || [], [product?.colors]);
+  const validColorIndex = useMemo(
+    () => (selectedColorIndex >= 0 && selectedColorIndex < colors.length ? selectedColorIndex : 0),
+    [selectedColorIndex, colors.length]
+  );
+  const selectedColor = useMemo(() => colors[validColorIndex], [colors, validColorIndex]);
+  const images = useMemo(() => selectedColor?.images || [product?.image || ''], [selectedColor?.images, product?.image]);
+  const variants = useMemo(() => selectedColor?.variants || [], [selectedColor?.variants]);
 
-  const colors = product.colors || [];
-  const selectedColor = colors[selectedColorIndex];
-  const images = selectedColor?.images || [product.image];
-  const variants = selectedColor?.variants || [];
+  const selectedVariant = useMemo(
+    () => variants.find((v) => v.size === selectedSize),
+    [variants, selectedSize]
+  );
 
-  const handleColorSelect = (index: number) => {
+  // Reset state when product changes
+  useEffect(() => {
+    setSelectedColorIndex(0);
+    setSelectedSize('');
+    setCurrentImageIndex(0);
+    setShowAlert(false);
+  }, [productId]);
+
+  // Ensure selectedColorIndex is valid when colors change
+  useEffect(() => {
+    if (colors.length > 0 && selectedColorIndex >= colors.length) {
+      setSelectedColorIndex(0);
+    }
+  }, [colors.length, selectedColorIndex]);
+
+  const handleColorSelect = useCallback((index: number) => {
     setSelectedColorIndex(index);
     setCurrentImageIndex(0);
-    setSelectedSize(''); // Reset size when color changes
-  };
+    setSelectedSize('');
+  }, []);
 
-  const handleSizeSelect = (size: string) => {
+  const handleSizeSelect = useCallback((size: string) => {
     setSelectedSize(size);
-  };
+  }, []);
 
-  const handlePreviousImage = () => {
+  const handlePreviousImage = useCallback(() => {
     setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
+  }, [images.length]);
 
-  const handleNextImage = () => {
+  const handleNextImage = useCallback(() => {
     setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
+  }, [images.length]);
 
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
-      return;
-    }
+  const showAlertAndHide = useCallback(() => {
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), ALERT_TIMEOUT);
+  }, []);
 
-    const selectedVariant = variants.find((v) => v.size === selectedSize);
-    if (!selectedVariant || selectedVariant.availability === 0) {
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
+  const handleAddToCart = useCallback(() => {
+    if (!product || !selectedSize || !selectedVariant || selectedVariant.availability === 0) {
+      showAlertAndHide();
       return;
     }
 
@@ -82,20 +119,24 @@ const ProductDetail: React.FC = () => {
       color: selectedColor?.name || 'Default',
       size: selectedSize,
     });
-
     setShowAlert(false);
-  };
+  }, [selectedSize, selectedVariant, product, images, selectedColor, addToCart, showAlertAndHide]);
 
-  const handleBuyNow = () => {
-    handleAddToCart();
-    if (selectedSize) {
+  const handleBuyNow = useCallback(() => {
+    if (selectedSize && selectedVariant && selectedVariant.availability > 0) {
+      handleAddToCart();
       navigate('/cart');
     }
-  };
+  }, [selectedSize, selectedVariant, handleAddToCart, navigate]);
 
-  const getSelectedVariant = () => {
-    return variants.find((v) => v.size === selectedSize);
-  };
+  // Early return AFTER all hooks
+  if (!product) {
+    return (
+      <Container>
+        <Typography variant="h4">Product not found</Typography>
+      </Container>
+    );
+  }
 
   return (
     <Box className="product-detail">
@@ -137,10 +178,7 @@ const ProductDetail: React.FC = () => {
                   src={images[currentImageIndex]}
                   alt={`${product.name} - ${currentImageIndex + 1}`}
                   className="main-image"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      'https://via.placeholder.com/600x800?text=Product+Image';
-                  }}
+                  onError={handleImageError}
                 />
                 <IconButton
                   className="carousel-button carousel-button-right"
@@ -167,14 +205,7 @@ const ProductDetail: React.FC = () => {
                       className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
                       onClick={() => setCurrentImageIndex(index)}
                     >
-                      <img
-                        src={image}
-                        alt={`Thumbnail ${index + 1}`}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'https://via.placeholder.com/100x100?text=Image';
-                        }}
-                      />
+                      <img src={image} alt={`Thumbnail ${index + 1}`} onError={handleThumbnailError} />
                     </Box>
                   ))}
                 </Box>
@@ -213,7 +244,7 @@ const ProductDetail: React.FC = () => {
             {colors.length > 0 && (
               <Box sx={{ mb: 3 }}>
                 <Typography variant="h6" gutterBottom>
-                  Color: {selectedColor?.name || 'Default'}
+                  Color: {selectedColor?.name || 'N/A'}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   {colors.map((color, index) => (
@@ -223,14 +254,14 @@ const ProductDetail: React.FC = () => {
                       onClick={() => handleColorSelect(index)}
                       sx={{
                         backgroundColor:
-                          index === selectedColorIndex ? color.hex : '#e0e0e0',
+                          index === validColorIndex ? color.hex : '#e0e0e0',
                         color:
-                          index === selectedColorIndex && color.hex === '#FFFFFF'
+                          index === validColorIndex && color.hex === '#FFFFFF'
                             ? '#000'
-                            : index === selectedColorIndex
+                            : index === validColorIndex
                             ? '#fff'
                             : '#000',
-                        border: `2px solid ${index === selectedColorIndex ? '#667eea' : 'transparent'}`,
+                        border: `2px solid ${index === validColorIndex ? PRIMARY_COLOR : 'transparent'}`,
                         cursor: 'pointer',
                         '&:hover': {
                           backgroundColor: color.hex,
@@ -260,12 +291,12 @@ const ProductDetail: React.FC = () => {
                         onClick={() => !isOutOfStock && handleSizeSelect(variant.size)}
                         disabled={isOutOfStock}
                         sx={{
-                          backgroundColor: isSelected ? '#667eea' : '#e0e0e0',
+                          backgroundColor: isSelected ? PRIMARY_COLOR : '#e0e0e0',
                           color: isSelected ? '#fff' : '#000',
                           cursor: isOutOfStock ? 'not-allowed' : 'pointer',
                           opacity: isOutOfStock ? 0.5 : 1,
                           '&:hover': {
-                            backgroundColor: isOutOfStock ? '#e0e0e0' : '#667eea',
+                            backgroundColor: isOutOfStock ? '#e0e0e0' : PRIMARY_COLOR,
                             color: isOutOfStock ? '#000' : '#fff',
                           },
                         }}
@@ -277,44 +308,18 @@ const ProductDetail: React.FC = () => {
             )}
 
             {/* Availability */}
-            {selectedSize && getSelectedVariant() && (
+            {selectedSize && selectedVariant && (
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Availability: {getSelectedVariant()?.availability} items in stock
+                Availability: {selectedVariant.availability} items in stock
               </Typography>
             )}
 
             {/* Action Buttons */}
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <Button
-                variant="contained"
-                size="large"
-                onClick={handleAddToCart}
-                sx={{
-                  flex: 1,
-                  minWidth: '200px',
-                  backgroundColor: '#667eea',
-                  '&:hover': {
-                    backgroundColor: '#5568d3',
-                  },
-                }}
-              >
+              <Button variant="contained" size="large" onClick={handleAddToCart} sx={{ flex: 1, minWidth: '200px', ...buttonSx }}>
                 Add to Cart
               </Button>
-              <Button
-                variant="outlined"
-                size="large"
-                onClick={handleBuyNow}
-                sx={{
-                  flex: 1,
-                  minWidth: '200px',
-                  borderColor: '#667eea',
-                  color: '#667eea',
-                  '&:hover': {
-                    borderColor: '#5568d3',
-                    backgroundColor: 'rgba(102, 126, 234, 0.04)',
-                  },
-                }}
-              >
+              <Button variant="outlined" size="large" onClick={handleBuyNow} sx={{ flex: 1, minWidth: '200px', ...outlinedButtonSx }}>
                 Buy Now
               </Button>
             </Box>

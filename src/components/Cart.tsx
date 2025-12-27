@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -16,15 +16,26 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useCart } from '../context/CartContext';
+import { PRIMARY_COLOR, PRIMARY_HOVER } from '../constants/theme';
 import './Cart.css';
 
-const Cart: React.FC = () => {
-  const navigate = useNavigate();
-  const { cartItems, removeFromCart, updateQuantity, getCartItemCount } = useCart();
+const buttonSx = {
+  backgroundColor: PRIMARY_COLOR,
+  '&:hover': { backgroundColor: PRIMARY_HOVER },
+};
 
-  const handleIncrement = (itemId: number, currentQuantity: number) => {
-    updateQuantity(itemId, currentQuantity + 1);
-  };
+const outlinedButtonSx = {
+  borderColor: PRIMARY_COLOR,
+  color: PRIMARY_COLOR,
+  '&:hover': {
+    borderColor: PRIMARY_HOVER,
+    backgroundColor: 'rgba(102, 126, 234, 0.04)',
+  },
+};
+
+const Cart = () => {
+  const navigate = useNavigate();
+  const { cartItems, removeFromCart, updateQuantity } = useCart();
 
   const handleDecrement = (itemId: number, currentQuantity: number) => {
     if (currentQuantity > 1) {
@@ -34,17 +45,15 @@ const Cart: React.FC = () => {
     }
   };
 
-  const handleRemove = (itemId: number) => {
-    removeFromCart(itemId);
-  };
+  const subtotal = useMemo(
+    () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
+    [cartItems]
+  );
 
-  const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
-
-  const calculateTotal = () => {
-    return calculateSubtotal();
-  };
+  const cartItemCount = useMemo(
+    () => cartItems.reduce((total, item) => total + item.quantity, 0),
+    [cartItems]
+  );
 
   if (cartItems.length === 0) {
     return (
@@ -56,17 +65,7 @@ const Cart: React.FC = () => {
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
           Start shopping to add items to your cart
         </Typography>
-        <Button
-          variant="contained"
-          size="large"
-          onClick={() => navigate('/')}
-          sx={{
-            backgroundColor: '#667eea',
-            '&:hover': {
-              backgroundColor: '#5568d3',
-            },
-          }}
-        >
+        <Button variant="contained" size="large" onClick={() => navigate('/')} sx={buttonSx}>
           Continue Shopping
         </Button>
       </Container>
@@ -77,7 +76,7 @@ const Cart: React.FC = () => {
     <Box className="cart-page">
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Typography variant="h3" component="h1" gutterBottom>
-          Shopping Cart ({getCartItemCount()} {getCartItemCount() === 1 ? 'item' : 'items'})
+          Shopping Cart ({cartItemCount} {cartItemCount === 1 ? 'item' : 'items'})
         </Typography>
 
         <Box
@@ -116,8 +115,7 @@ const Cart: React.FC = () => {
                         }}
                         onClick={() => navigate(`/product/${item.productId}`)}
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'https://via.placeholder.com/200x200?text=Product+Image';
+                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x200?text=Product+Image';
                         }}
                       />
                     </Box>
@@ -181,7 +179,7 @@ const Cart: React.FC = () => {
                         </Typography>
                         <IconButton
                           size="small"
-                          onClick={() => handleIncrement(item.id, item.quantity)}
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           sx={{
                             '&:hover': {
                               backgroundColor: 'rgba(102, 126, 234, 0.1)',
@@ -194,7 +192,7 @@ const Cart: React.FC = () => {
 
                       <IconButton
                         color="error"
-                        onClick={() => handleRemove(item.id)}
+                        onClick={() => removeFromCart(item.id)}
                         sx={{
                           '&:hover': {
                             backgroundColor: 'rgba(211, 47, 47, 0.1)',
@@ -225,7 +223,7 @@ const Cart: React.FC = () => {
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="body1">Subtotal:</Typography>
-                  <Typography variant="body1">${calculateSubtotal().toFixed(2)}</Typography>
+                  <Typography variant="body1">${subtotal.toFixed(2)}</Typography>
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -238,38 +236,15 @@ const Cart: React.FC = () => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
                   <Typography variant="h6">Total:</Typography>
                   <Typography variant="h6" color="primary">
-                    ${calculateTotal().toFixed(2)}
+                    ${subtotal.toFixed(2)}
                   </Typography>
                 </Box>
 
-                <Button
-                  variant="contained"
-                  fullWidth
-                  size="large"
-                  sx={{
-                    mb: 2,
-                    backgroundColor: '#667eea',
-                    '&:hover': {
-                      backgroundColor: '#5568d3',
-                    },
-                  }}
-                >
+                <Button variant="contained" fullWidth size="large" sx={{ mb: 2, ...buttonSx }}>
                   Proceed to Checkout
                 </Button>
 
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  onClick={() => navigate('/')}
-                  sx={{
-                    borderColor: '#667eea',
-                    color: '#667eea',
-                    '&:hover': {
-                      borderColor: '#5568d3',
-                      backgroundColor: 'rgba(102, 126, 234, 0.04)',
-                    },
-                  }}
-                >
+                <Button variant="outlined" fullWidth onClick={() => navigate('/')} sx={outlinedButtonSx}>
                   Continue Shopping
                 </Button>
               </CardContent>

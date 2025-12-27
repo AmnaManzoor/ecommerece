@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Box,
   Container,
@@ -12,7 +11,7 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import './Footer.css';
 
-const Footer: React.FC = () => {
+const Footer = () => {
   return (
     <Box component="footer" className="footer">
       <Container maxWidth="lg" className="footer-container">

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   AppBar,
@@ -13,7 +12,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useCart } from '../context/CartContext';
 import './NavBar.css';
 
-const NavBar: React.FC = () => {
+const NavBar = () => {
   const navigate = useNavigate();
   const { getCartItemCount } = useCart();
   const cartItemCount = getCartItemCount();

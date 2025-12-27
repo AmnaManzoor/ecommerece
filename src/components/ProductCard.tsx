@@ -1,4 +1,4 @@
-import React from 'react';
+import { type MouseEvent, type SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -12,13 +12,23 @@ import {
 } from '@mui/material';
 import { Product } from '../types/Product';
 import { useCart } from '../context/CartContext';
+import { PRIMARY_COLOR, PRIMARY_HOVER } from '../constants/theme';
 import './ProductCard.css';
+
+const buttonSx = {
+  backgroundColor: PRIMARY_COLOR,
+  '&:hover': { backgroundColor: PRIMARY_HOVER },
+};
+
+const handleImageError = (e: SyntheticEvent<HTMLImageElement>) => {
+  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x400?text=Product+Image';
+};
 
 interface ProductCardProps {
   product: Product;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard = ({ product }: ProductCardProps) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
@@ -26,7 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     navigate(`/product/${product.id}`);
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = (e: MouseEvent) => {
     e.stopPropagation();
     // Get first available color and size
     const firstColor = product.colors?.[0];
@@ -66,10 +76,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         image={product.image}
         alt={product.name}
         className="product-image"
-        onError={(e) => {
-          // Fallback image if the URL fails
-          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x400?text=Product+Image';
-        }}
+        onError={handleImageError}
       />
       <CardContent className="product-info">
         <Typography
@@ -126,12 +133,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           fullWidth 
           className="product-button"
           onClick={handleAddToCart}
-          sx={{
-            backgroundColor: '#667eea',
-            '&:hover': {
-              backgroundColor: '#5568d3',
-            },
-          }}
+          sx={buttonSx}
         >
           Add to Cart
         </Button>

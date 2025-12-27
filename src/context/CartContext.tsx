@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, useMemo, useCallback, type ReactNode } from 'react';
 
 export interface CartItem {
   id: number;
@@ -34,13 +34,12 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
-export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+export const CartProvider = ({ children }: CartProviderProps) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const nextIdRef = useRef(1);
 
-  const addToCart = (item: Omit<CartItem, 'id' | 'quantity'>) => {
+  const addToCart = useCallback((item: Omit<CartItem, 'id' | 'quantity'>) => {
     setCartItems((prevItems) => {
-      // Check if item with same productId, color, and size already exists
       const existingItemIndex = prevItems.findIndex(
         (existingItem) =>
           existingItem.productId === item.productId &&
@@ -49,54 +48,47 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       );
 
       if (existingItemIndex >= 0) {
-        // Update quantity if item exists
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += 1;
         return updatedItems;
-      } else {
-        // Add new item
-        const newId = nextIdRef.current++;
-        return [...prevItems, { ...item, id: newId, quantity: 1 }];
       }
+      return [...prevItems, { ...item, id: nextIdRef.current++, quantity: 1 }];
     });
-  };
+  }, []);
 
-  const removeFromCart = (itemId: number) => {
+  const removeFromCart = useCallback((itemId: number) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
-  };
+  }, []);
 
-  const updateQuantity = (itemId: number, quantity: number) => {
+  const updateQuantity = useCallback((itemId: number, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(itemId);
       return;
     }
     setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === itemId ? { ...item, quantity } : item
-      )
+      prevItems.map((item) => (item.id === itemId ? { ...item, quantity } : item))
     );
-  };
+  }, [removeFromCart]);
 
-  const getCartItemCount = () => {
+  const getCartItemCount = useCallback(() => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
+  }, [cartItems]);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
-  };
+  }, []);
 
-  return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        getCartItemCount,
-        clearCart,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+  const value = useMemo(
+    () => ({
+      cartItems,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      getCartItemCount,
+      clearCart,
+    }),
+    [cartItems, addToCart, removeFromCart, updateQuantity, getCartItemCount, clearCart]
   );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
