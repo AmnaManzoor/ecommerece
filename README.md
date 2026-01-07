@@ -4,7 +4,7 @@ A modern React TypeScript e-commerce application for men's fashion.
 
 ## ⚠️ Important: Running the Application
 
-**You must run `npm start` from inside the `ecommerece` directory, not from the parent "Loopply Web" directory.**
+**You must run `npm start` from inside the `ecommerece` directory, not from the parent directory.**
 
 ```bash
 cd ecommerece
