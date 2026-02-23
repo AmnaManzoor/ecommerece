@@ -15,7 +15,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_KEY }}
-          script:
-            cd /root/ecommerce-website
-            git pull origin main
-            docker-compose up -d --build
+          script: |
+           cd /root/ecommerce-website
+           git pull origin main
+           docker-compose up -d --build
