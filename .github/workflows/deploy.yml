@@ -24,5 +24,4 @@ jobs:
           script: |
             cd /root/ecommerce
             git pull origin main
-            docker-compose up -d --build
-          strict_host_key_checking: false
+            docker compose up -d --build
