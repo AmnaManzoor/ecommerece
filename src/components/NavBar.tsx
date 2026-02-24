@@ -53,7 +53,7 @@ const NavBar = () => {
     <Box onClick={handleNavClick} sx={{ textAlign: 'center', minHeight: '100vh', pt: 2 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, mb: 2 }}>
         <Typography variant="h6" component={Link} to="/" sx={{ fontWeight: 700, textDecoration: 'none', color: '#667eea' }}>
-          ecommerce
+          ecommerce 2026
         </Typography>
         <IconButton onClick={handleDrawerToggle} sx={{ color: '#667eea' }}>
           <CloseIcon />
@@ -113,7 +113,7 @@ const NavBar = () => {
           }}
           className="navbar-logo"
         >
-          ecommerce
+          ecommerce 2026
         </Typography>
 
         {/* Desktop Navigation */}

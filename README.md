@@ -1,4 +1,4 @@
-# ecommerce - Men's Online Shop
+# ecommerce 2026 - Men's Online Shop
 
 A modern React TypeScript e-commerce application for men's fashion.
 

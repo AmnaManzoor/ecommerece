@@ -29,7 +29,7 @@ const Footer = () => {
         >
           <Box>
             <Typography variant="h6" className="footer-title" gutterBottom>
-              ecommerce
+              ecommerce 2026
             </Typography>
             <Typography variant="body2" className="footer-description">
               Your premier destination for men's fashion. Quality clothing for the modern gentleman.
@@ -98,7 +98,7 @@ const Footer = () => {
       <Box className="footer-bottom">
         <Container maxWidth="lg">
           <Typography variant="body2" align="center">
-            &copy; {new Date().getFullYear()} ecommerce. All rights reserved.
+            &copy; {new Date().getFullYear()} ecommerce 2026. All rights reserved.
           </Typography>
         </Container>
       </Box>
