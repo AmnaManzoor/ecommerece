@@ -22,6 +22,7 @@ jobs:
           timeout: 30s
           command_timeout: 10m
           script: |
-            cd /root/ecommerce
+            cd /root/ecommerece
             git pull origin main
-            docker compose up -d --build
+            docker compose -f /root/ecommerece/docker-compose.yml up -d --build
+          
