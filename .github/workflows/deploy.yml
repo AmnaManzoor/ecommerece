@@ -22,7 +22,7 @@ jobs:
           timeout: 30s
           command_timeout: 10m
           script: |
-            cd /root/ecommerce-website
+            cd /root/ecommerce
             git pull origin main
             docker-compose up -d --build
           strict_host_key_checking: false
